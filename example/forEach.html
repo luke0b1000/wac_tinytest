@@ -23,19 +23,23 @@
 //   console.log(originalArray);
 // })
 
-function forEach(array, callback) {
+function forEach(array, callback, optionalThisObject) {
+  var forEachCallback = callback;
+  if (optionalThisObject) {
+    forEachCallback = callback.bind(optionalThisObject);
+  }
   for (var i = 0; i < array.length; i++) {
-    callback(array[i], i, array);
+    forEachCallback(array[i], i, array);
   }
 }
 
 tests({
   'It should run the callback function array.length times': function() {
-    var counter = 0;
+    var numberOfTimesCallbackHasRun = 0;
     forEach([1,2,3], function() {
-      counter++;
+      numberOfTimesCallbackHasRun++;
     })
-    eq(counter, 3);
+    eq(numberOfTimesCallbackHasRun, 3);
   },
   'It should pass in the ith element as the first argument to the callback': function() {
     forEach([1], function(number) {
@@ -48,10 +52,16 @@ tests({
     })
   },
   'It should pass in the original array as the third argument to the callback': function(){
-    var testArray = [1,2,3];                                      // this was done because Arrays are functions and they depend on memory locations
+    var testArray = [1,2,3];                                      // this was done because Arrays are objects and they depend on memory locations
     forEach(testArray, function(number, index, originalArray) {
       eq(originalArray, testArray);                               // checking if they both point to the same memory location
     })
+  },
+
+  'It should accept an optional this object': function(){
+    forEach([1], function(){
+      eq(this.description, 'I should be accessible inside of the callback');
+    }, {description: 'I should be accessible inside of the callback'});
   },
 
 });   // tinytest takes in test({});    'name': function() { eq( expected value, testFunction() ) }

@@ -10,3 +10,5 @@ Testing (how to write code that makes sure your code works)
         });
         </script>
     2. forEach, first steps
+    3. forEach, callback arguments
+    4. forEach, optional this
