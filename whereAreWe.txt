@@ -5,10 +5,33 @@ Testing (how to write code that makes sure your code works)
         test({
             'It should Name': function() {
                 callTestStuff();
-                eq(variableOfExpectedValue, expectedValue);
+                eq(???variableOfExpectedValue, expectedValue);
             }
         });
         </script>
     2. forEach, first steps
     3. forEach, callback arguments
     4. forEach, optional this
+    5. filter
+    6. map
+        var weirdArray = [,1,undefined];    // (Array) [empty, 1, undefined]
+        weirdArray[0]; // undefined
+        weirdArray[1]; // 1
+        weirdArray[2]; // undefined // why is there similar results with weirdArray[0]
+
+        0 in weirdArray;    // false
+        1 in weirdArray;    // true
+        2 in weirdArray;    // true
+        
+        var fakeArray = {
+            1:1,
+            2: undefined,
+        }
+        fakeArray[0];   // undefined    // doesn't exist
+        fakeArray[1];   // 1
+        fakeArray[2];   // undefined
+
+        propertyName in objext
+        0 in fakeArray; // false
+        1 in fakeArray; // true
+        2 in fakeArray; // true     // cause it exist as a propertyName
