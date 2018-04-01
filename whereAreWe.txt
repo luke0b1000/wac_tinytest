@@ -1,0 +1,12 @@
+Testing (how to write code that makes sure your code works)
+    1. What is testing?
+        <script src="../tinytest.js"></script>
+        <script>
+        test({
+            'It should Name': function() {
+                callTestStuff();
+                eq(variableOfExpectedValue, expectedValue);
+            }
+        });
+        </script>
+    2. forEach, first steps
