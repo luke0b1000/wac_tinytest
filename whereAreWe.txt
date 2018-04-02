@@ -35,3 +35,14 @@ Testing (how to write code that makes sure your code works)
         0 in fakeArray; // false
         1 in fakeArray; // true
         2 in fakeArray; // true     // cause it exist as a propertyName
+    7. reduce, first steps
+        function reduce(array, callback, startingValue) {
+            var resultsSoFar = startingValue;
+            for (var i = 0; i < array.length; i++) {
+                resultsSoFar = callback(resultsSoFar, array[i]);
+            }
+            return resultsSoFar;
+        }
+        reduce(['g','o','r','d','o','n'], function(resultsSoFar, nextLetter) {
+            return resultsSoFar + nextLetter;
+        }, '');         // "gordon" (String)
