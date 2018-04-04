@@ -1,112 +1,175 @@
 <script src="../tinytest.js"></script>
 <script>
 
-// Example 1: Callback should run 3 times.
-// map([1,2,3], function(){});
+// Protoype implmentation:
+// function reduce(array, callback, startingValue) {
+//     var resultsSoFar = startingValue;
+//     for (var i = 0; i < array.length; i++) {
+//         resultsSoFar = callback(resultsSoFar, array[i], i, array);
+//     }
+//     return resultsSoFar;
+// }
 
-// Example 2: Callback has access to ith element.
-// map([1,2,3], function(number){
-//     console.log(number);
-// });
+// Function signature:
+// reduce(array, callback[, initialValue])
 
-// Example 3: Callback has access to index.
-// map([1,2,3], function(number,index){
-//     console.log(index);
-// });
+// Callback parameters:
+//     previousValue
+//     currentValue
+//     currentIndex
+//     array
 
-// Example 4: Callback has access to originalArray.
-// map([1,2,3], function(number, index, originalArray) {
-//     console.log(originalArray);
-// });
+// Returns a single value.
+// If initialValue, previousValue should start with initialValue.
+// If initialValue, currentValue should start with array[0].
+// If initialValue, callback will start at index 0.
 
-// Example 5: Optional this.
-// map([1,2,3], function() {
-//     console.log(this.name);
-// }, {name:'Gordon'});
+// If no initialValue, previousValue should start with array[0].
+// If no initialValue, currentValue should start with array[1].
+// If no initialValue, callback will start at index 1.
 
-// Example 6: It should return an array
-// var originalArray = [1,2,3];
-// var mappedArray = map(originalArray, function() {});
-// originalArray !== mappedArray;
+// If initialValue, and array is empty, return initialValue without calling callback.
+// If no initialValue, and array has one element, it should return that element without calling callback.
 
-// Example 7: It should return an array with result of callback
-// var originalArray = [1,2,3];
-// var mappedArray = map(originalArray, function(element) {
-//     return element * 2;
-// });
-// mappedArray === [2,4,6];
+// It should actually reduce.
+// It should exclude holes.
+// If array is empty, and no initialValue, throw TypeError.
+// It should pass array as fourth argument to callback.
 
-function map(originalArray, callback, optionalThis) {
-  var mapCallback = callback;
-  if (optionalThis) {
-    mapCallback = callback.bind(optionalThis);
-  }
-  var mappedArray = [];
-  for (var i = 0; i < originalArray.length; i++) {
-    if (i in originalArray) {
-      mappedArray[i] = mapCallback(originalArray[i],i, originalArray);
+function reduce(array, callback, initialValue) {
+  var startingIndex = 0;
+  var resultsSoFar = initialValue;
+  var length = array.length;
+  var arrayIndexes = Object.keys(array);
+  // No initialValue then run
+  if (arguments.length < 3) {
+    
+    if (arrayIndexes.length === 0) {
+      throw new TypeError('Reduce of empty array with no initial value');
+    }
+
+    if (arrayIndexes.length===1) {        // check for holes, but still only 1 element in actual array
+      var onlyIndex = arrayIndexes[0];
+      var onlyElement = array[onlyIndex];
+      return onlyElement;
+    }
+    // skips holes in the beginning of array
+    while(startingIndex in array=== false && startingIndex < length){ // keep on incrementing as long as hole
+      startingIndex++;
+    }
+    resultsSoFar = array[startingIndex];
+    startingIndex++;  // 1
+
+  } else {  // HAS INITIAL VALUE
+    if (arrayIndexes.length===0) {
+      return initialValue;
     }
   }
-  return mappedArray;
+
+  for (var i = startingIndex; i < length; i++) {
+    if (i in array) {
+      resultsSoFar = callback(resultsSoFar, array[i], i, array);    // previousValue, currentValue, currentIndex
+    }
+  }
+  return resultsSoFar;
 }
 
 tests({
-  'It should run the callback function array.length times.': function() {
-    var callbackHasBeenRunNTimes = 0;
-    map([1,2,3], function(){
-      callbackHasBeenRunNTimes++;
+  'If initialValue, callback should run array.length times.': function() {
+    var numberOfTimesCallbackHasRun = 0;
+    reduce([1], function() {
+        numberOfTimesCallbackHasRun++;
+    }, 0);
+    eq(numberOfTimesCallbackHasRun, 1);
+  },
+  'If no initialValue, callback should run array.length -1 times.': function() {
+    var numberOfTimesCallbackHasRun = 0;
+    reduce([1], function() {
+        numberOfTimesCallbackHasRun++;
     });
-    eq(callbackHasBeenRunNTimes, 3);
+    eq(numberOfTimesCallbackHasRun, 0);
   },
-  'It should pass in the ith element as the first argument to the callback.': function() {
-    map([1], function(element){
-      eq(element, 1);
+  'If initialValue, previousValue should start with initialValue.': function() {
+    reduce([1], function(previousValue) {
+      eq(previousValue, 0);
+    },0);
+  },
+  'If initialValue, currentValue should start with array[0].': function() {
+    reduce([1], function(previousValue, currentValue) {
+      eq(currentValue, 1);
+    },0);
+  },
+  'If initialValue, callback will start at index 0.': function() {
+    reduce([1], function(previousValue, currentValue, currentIndex) {
+      eq(currentIndex, 0);
+    },0);
+  },
+  'If no initialValue, previousValue should start with array[0].': function() {
+    reduce([1,2], function(previousValue) {
+      eq(previousValue, 1);
     });
   },
-  'It should pass in position ith as the second argument to the callback.': function(){
-    map([1], function(element, position) {
-      eq(position, 0);
+  'If no initialValue, currentValue should start with array[1].': function() {
+    reduce([1,2], function(previousValue, currentValue) {
+      eq(currentValue, 2);
     });
   },
-  'It should pass in the original array as the third argument to the callback.': function(){
-    var testArray = [1,2,3];
-    map(testArray, function(element, position, originalArray) {
-      eq(originalArray, testArray);
+  'If no initialValue, callback will start at index 1.': function() {
+    reduce([1,2], function(previousValue, currentValue, currentIndex) {
+      eq(currentIndex, 1);
     });
   },
-  'It should accept an optional this object.': function(){
-    map([1,2,3], function(){
-      eq(this.description, 'watchandcode');
-    }, {description:'watchandcode'});
+  'If initialValue, and array is empty, return initialValue without calling callback.': function() {
+    var numberOfTimesCallbackHasRun = 0;
+    var initialValue = 0
+    var reduceResult = reduce([,,,], function() {
+      numberOfTimesCallbackHasRun++;
+    },initialValue);
+    eq(reduceResult,initialValue);
+    eq(numberOfTimesCallbackHasRun, 0);
+
   },
-  'It should return an array.': function() {
-    var originalArray = [1,2,3];
-    var mappedArray = map(originalArray, function() {});
-    eq(Array.isArray(mappedArray), true);
-  },
-  'It should return a new array, not the original array.': function() {
-    var originalArray = [];
-    var mappedArray = map(originalArray, function(){});
-    eq(originalArray !== mappedArray, true);
-  },
-  'It should return a mapped array.': function() {
-    var originalArray = [1,2,3];
-    var mappedArray = map(originalArray, function(element) {
-        return element * 2;
+  'If no initialValue, and array has one element, it should return that element without calling callback.': function() {
+    var numberOfTimesCallbackHasRun = 0;
+    var reduceResult = reduce([5], function() {
+      numberOfTimesCallbackHasRun++;
     });
-    eq(mappedArray.length, 3);
-    eq(mappedArray[0] === 2, true);
-    eq(mappedArray[1], 4);
-    eq(mappedArray[2] === 6, true);
+    eq(numberOfTimesCallbackHasRun,0);
+    eq(reduceResult, 5);
   },
-  'It should skip unassigned indexes': function() {
-    var weirdArray = [,1];
-    var mappedArray = map(weirdArray, function double(element) {
-      return element * 2;
+  'It should actually reduce.': function() {
+    var reduceResult = reduce([1,2,3], function(a,b) {
+      return a+b;
     });
-    eq(0 in mappedArray, false);
-    eq(mappedArray[1], 2);
+    eq(reduceResult, 6);
   },
+  'If initialValue, it should exclude holes.': function() {
+    var sum = reduce([,1,2,3], function(a,b) {
+      return a+b;
+    },0);
+    eq(sum, 6);
+  },
+  'If no initialValue, it should exclude holes.': function() {
+    var sum = reduce([,1,2,3], function(a,b) {
+      return a+b;
+    });
+    eq(sum, 6);
+  },
+  'If array is empty, and no initialValue, throw TypeError.': function() {
+    var isTypeError = false;
+    try {
+      reduce([], function() {});
+    } catch(e) {
+      var isTypeError = (e instanceof TypeError);
+      eq(isTypeError, true);
+    }
+  },
+  'It should pass array as fourth argument to callback.': function() {
+    var testArray = [1,2];
+    reduce(testArray, function(previousValue, currentValue, currentIndex, arrayToReduce) {
+      eq(arrayToReduce, testArray);
+    });
+  }, 
 
 });   // tinytest takes in test({});    'name': function() { eq( expected value, testFunction() ) }
 </script>

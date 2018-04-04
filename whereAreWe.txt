@@ -19,7 +19,7 @@ Testing (how to write code that makes sure your code works)
         weirdArray[1]; // 1
         weirdArray[2]; // undefined // why is there similar results with weirdArray[0]
 
-        0 in weirdArray;    // false
+        0 in weirdArray;    // false        // test in the index position if weirdArray has a value
         1 in weirdArray;    // true
         2 in weirdArray;    // true
         
@@ -47,7 +47,7 @@ Testing (how to write code that makes sure your code works)
             return resultsSoFar + nextLetter;       // No InitialValue, so first run is resultsSoFar = g and nextLetter = o
         }, '');         // "gordon" (String)
     8. reduce, deciphering docs
-        Protype implmentation:
+        Protoype implmentation:
         function reduce(array, callback, startingValue) {
             var resultsSoFar = startingValue;
             for (var i = 0; i < array.length; i++) {
@@ -118,3 +118,23 @@ Testing (how to write code that makes sure your code works)
             It should exclude holes.
             If array is empty, and no initialValue, throw TypeError.
             It should pass array as fourth argument to callback.
+    9. reduce, finishing up
+        Object.keys([,1,,3,,5]) // will return the indexes that are not holed ["1", "3", "5"]
+        Boolean(index in Array)     // check if that index exist in Array
+
+        try {
+            // code that will run and possibly produce the error
+        } catch(error) {
+            console.log(error);
+            if (e instanceOf TypeError) {   // object instanceOf contructor // e is the object, is it an TypeError
+
+            }
+        }
+
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch
+
+        throw new TypeError('Error message you want to throw');
+
+        Becareful of callbacks that may increase length, you may loop forever with array.length
