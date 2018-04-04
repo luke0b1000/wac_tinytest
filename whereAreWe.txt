@@ -105,6 +105,8 @@ Testing (how to write code that makes sure your code works)
         Requirements:
             If initialValue, previousValue should start with initialValue.
             If initialValue, currentValue should start with array[0].
+
+
             If initialValue, callback will start at index 0.
 
             If no initialValue, previousValue should start with array[0].
@@ -138,3 +140,29 @@ Testing (how to write code that makes sure your code works)
         throw new TypeError('Error message you want to throw');
 
         Becareful of callbacks that may increase length, you may loop forever with array.length
+
+SimpleTest
+    1. Error handling, setTimeout
+        1. Run Javascript.
+        2. Update the DOM.
+        3. Extra tasks (e.g. callbacks passed into setTimeout)
+
+        setTimeout is delayed, give the chance to update the DOM. Without setTimeout, the code runs through before the DOM is there, thus being false, won't change the background color, because the number 2. DOM doesn't even exist yet. setTimeout pushes the priority to Number 3.
+    
+        https://www.youtube.com/watch?v=8aGhZQkoFbQ
+        https://www.youtube.com/watch?v=QyUFheng6J0
+    2. Constructors, console.log outputs
+        function Person(name) {
+            // name - gordon
+            // species - human
+            // this = {};           // only there if new is used
+            this.name = name;
+            this.species = 'human';
+            // return this;         // only there if new is used
+        }
+
+        new Person('Gordon');   // Object Person {name:"Gordon", species:'human'}
+
+        Person('Gordon');       // this is in window, window.name = 'Gordon', window.species = 'human' return value is undefined . which is problematic because it sticks into window objext
+
+        console.log("%cSOME COLOR" + "some more color", "color:green;");
